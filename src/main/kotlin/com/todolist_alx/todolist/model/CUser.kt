@@ -12,9 +12,10 @@ import java.io.Serializable
 class CUser(
     @Id val name: String,
     val pass: String,
-    @OneToMany(mappedBy = "owner") val ownedTodoLists: List<TodoList>?,
-    @ManyToMany(mappedBy = "members") val sharedTodoLists: List<TodoList>?,
-    @OneToMany(mappedBy = "createdBy") val todoElements: List<TodoElement>?
+    @OneToMany(mappedBy = "owner") val ownedTodoLists: MutableList<TodoList> = mutableListOf(),
+    @ManyToMany(mappedBy = "members") val sharedTodoLists: MutableList<TodoList> = mutableListOf(),
+    @OneToMany(mappedBy = "createdBy") val todoElements: MutableList<TodoElement> = mutableListOf(),
+    @OneToMany(mappedBy = "markedAsDoneBy") val completedTodoElements: MutableList<TodoElement> = mutableListOf()
 ) : UserDetails, Serializable {
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf()

@@ -19,16 +19,13 @@ class CUserService (private val cUserRepository: CUserRepository): UserDetailsSe
 
     @Throws(IllegalArgumentException::class)
     fun registerBy(user: UserRequestDTO) {
-    isValidUsername(user.username)
-    isValidPassword(user.password)
+    usernameValidatorBy(user.username)
+    passwordValidatorBy(user.password)
     // hashing password
     val hashedPassword = BCryptPasswordEncoder().encode(user.password)
     val newUser = CUser(
         name = user.username.lowercase(),
         pass = hashedPassword,
-        ownedTodoLists = null,
-        sharedTodoLists = null,
-        todoElements = null
     )
         // save into db
         cUserRepository.save(newUser)
@@ -38,11 +35,11 @@ class CUserService (private val cUserRepository: CUserRepository): UserDetailsSe
         cUserRepository.existsById(username)
 
     @Throws(IllegalArgumentException::class)
-    fun isValidUsername(username: String): Boolean {
+    fun usernameValidatorBy(username: String): Boolean {
         //Check username validity (min chars >= 3, allowed chars: -_, starting with a char)
         val usernamePattern = "^[a-zA-Z][a-zA-Z0-9-_]{2,}$".toRegex()
         if(!usernamePattern.matches(username)) {
-            throw IllegalArgumentException("Username doesn't matches the required pattern.")
+            throw IllegalArgumentException("Username doesn't match the required pattern.")
         }
 
         // Check username availability
@@ -54,11 +51,11 @@ class CUserService (private val cUserRepository: CUserRepository): UserDetailsSe
     }
 
     @Throws(IllegalArgumentException::class)
-    fun isValidPassword(password: String): Boolean {
+    fun passwordValidatorBy(password: String): Boolean {
         // Check password validity (min length >= 8)
         val usernamePattern = "^.{8,}$".toRegex()
         if(!usernamePattern.matches(password)) {
-            throw IllegalArgumentException("Password doesn't matches the required pattern.")
+            throw IllegalArgumentException("Password doesn't match the required pattern.")
         }
 
         return true

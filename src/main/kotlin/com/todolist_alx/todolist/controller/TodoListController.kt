@@ -2,33 +2,67 @@ package com.todolist_alx.todolist.controller
 
 import com.todolist_alx.todolist.config.API_PREFIX
 import com.todolist_alx.todolist.model.CUser
-import com.todolist_alx.todolist.model.TodoList
 import com.todolist_alx.todolist.service.TodoListService
 import jakarta.websocket.server.PathParam
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("$API_PREFIX/todolist")
 class TodoListController (val todoListService: TodoListService) {
 
-//    @GetMapping("/all")
-//    fun userOwnedTodoLists(authentication: Authentication): ResponseEntity<List<TodoList>> {
-//        // TODO: fetch all user owned todoLists.
-//    }
+    @GetMapping("/all")
+    fun userTodoLists(authentication: Authentication): ResponseEntity<List<TodoListResponse>> {
+        // Fetch all user todoLists.
+        try {
+            val userTodoLists = todoListService.findUserTodoListsBy(authentication.name)
+            return ResponseEntity.ok(userTodoLists)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            return ResponseEntity.internalServerError().build()
+        }
+    }
+
+    @GetMapping("/owned/all")
+    fun userOwnedTodoLists(authentication: Authentication): ResponseEntity<List<TodoListResponse>> {
+        // Fetch all user owned todoLists.
+        try {
+            val authenticatedUser = authentication.principal as CUser
+            val userTodoLists = todoListService.findUserOwnedTodoListsBy(authenticatedUser)
+            return ResponseEntity.ok(userTodoLists)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            return ResponseEntity.internalServerError().build()
+        }
+    }
+
+    @GetMapping("/shared/all")
+    fun userSharedTodoLists(authentication: Authentication): ResponseEntity<List<TodoListResponse>> {
+        // Fetch all user shared todoLists.
+        try {
+            val userTodoLists = todoListService.findUserSharedTodoListsBy(authentication.name)
+            return ResponseEntity.ok(userTodoLists)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            return ResponseEntity.internalServerError().build()
+        }
+    }
 
     @PostMapping("/add")
-    fun addTodoList(@RequestBody todolistDTO: TodoListRequestDTO, authentication: Authentication): ResponseEntity<String> {
+    fun addTodoList(@RequestBody todolistDTO: TodoListRequest, authentication: Authentication): ResponseEntity<String> {
         // Create a todolist instance and insert it into db.
-        val authenticatedUser = authentication.principal as CUser
         try {
+            val authenticatedUser = authentication.principal as CUser
             todoListService.addNewTodoList(todolistDTO, authenticatedUser)
         } catch (ex: IllegalArgumentException) {
             return ResponseEntity.badRequest().body(ex.message)
@@ -36,14 +70,13 @@ class TodoListController (val todoListService: TodoListService) {
             ex.printStackTrace()
             return ResponseEntity.internalServerError().build()
         }
-
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
-    @DeleteMapping("/delete")
-    fun removeTodoList(@PathParam(value = "todolistId") todolistId: Long, authentication: Authentication): ResponseEntity<String> {
-        val authenticatedUser = authentication.principal as CUser
+    @DeleteMapping("/{todolistId}/delete")
+    fun removeTodoList(@PathVariable(value = "todolistId") todolistId: Long, authentication: Authentication): ResponseEntity<String> {
         try {
+            val authenticatedUser = authentication.principal as CUser
             todoListService.removeTodoListBy(todolistId, authenticatedUser)
         } catch (ex: IllegalArgumentException) {
             return ResponseEntity.badRequest().body(ex.message)
@@ -51,23 +84,50 @@ class TodoListController (val todoListService: TodoListService) {
             ex.printStackTrace()
             return ResponseEntity.internalServerError().build()
         }
-
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
-    @PostMapping("/members/add")
-    fun addNewMember(): ResponseEntity<String> {
-        //TODO: Add new member if doesn't exist.
-
+    //Add new member if it doesn't exist.
+    @PostMapping("/{todolistId}/members/add/{username}")
+    fun addNewMember(@PathVariable(value = "todolistId") todolistId: Long,
+                     @PathVariable(value = "username") username: String,
+                     authentication: Authentication
+    ): ResponseEntity<String> {
+        try {
+            val authenticatedUser = authentication.principal as CUser
+            todoListService.addNewMember(authenticatedUser, todolistId, username)
+        } catch (ex: IllegalArgumentException) {
+            return ResponseEntity.badRequest().body(ex.message)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            return ResponseEntity.internalServerError().build()
+        }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 
-    @DeleteMapping("/members/remove")
-    fun removeMember(): ResponseEntity<String> {
-        //TODO: Remove member if doesn't exist.
-
+    //Remove member if it doesn't exist.
+    @DeleteMapping("/{todolistId}/members/remove/{username}")
+    fun removeMember(@PathVariable(value = "todolistId") todolistId: Long,
+                     @PathVariable(value = "username") username: String,
+                     authentication: Authentication
+    ): ResponseEntity<String> {
+        try {
+            val authenticatedUser = authentication.principal as CUser
+            todoListService.removeMember(authenticatedUser, todolistId, username)
+        } catch (ex: IllegalArgumentException) {
+            return ResponseEntity.badRequest().body(ex.message)
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            return ResponseEntity.internalServerError().build()
+        }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build()
     }
 }
 
-data class TodoListRequestDTO(val name: String, val description: String);
+data class TodoListRequest(val name: String, val description: String?);
+data class TodoListResponse(val id: Long, val name: String,
+                                val description: String?,
+                                val createdAt: LocalDateTime,
+                                val owner: String,
+                                val members: List<String> = listOf(),
+                                val elements: List<TodoListElementResponse> = listOf());
