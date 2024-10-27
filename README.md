@@ -4,18 +4,20 @@
 This is a To-Do List application built with Spring Boot and Kotlin. The application allows users to manage their tasks efficiently by creating and managing to-do lists and task elements. It features user registration, task management, and collaboration functionalities.
 
 ## Features
-- **User Registration**: Users can create an account to manage their tasks.
-- **To-Do Lists**: Users can create, view, and delete their to-do lists.
-- **Task Management**: Users can add, remove, and mark tasks as completed.
-- **Collaboration**: Users can share to-do lists with others.
+- **User Registration**: Users can create an account to manage their resources.
+- **User Authentication**: Users can authenticate to manage their resources.
 - **Password Security**: User passwords are hashed for secure storage.
+- **To-Do Lists Management**: Users can create, view, and delete their to-do lists.
+- **To-Do List Elements Management**: Users can add, remove, view, and mark as completed.
+- **Collaboration**: Users can share to-do lists with others.
 - **RESTful API**: The application exposes a RESTful API for client-server interactions.
 
 ## Technologies Used
-- **Backend**: Spring Boot, Kotlin
-- **Database**: H2 (in-memory database)
+- **Backend**:  Spring framework, Spring Boot, Kotlin
+- **Database**: H2 database
 - **Security**: Spring Security
 - **Build Tool**: Gradle
+
 
 ## Getting Started
 
@@ -37,6 +39,7 @@ This is a To-Do List application built with Spring Boot and Kotlin. The applicat
 ./gradlew bootRun
 
 ## API Endpoints:
+http://localhost:8080/swagger-ui/index.html
 
 ### User Registration:
 

@@ -51,7 +51,7 @@ class TodoListService(val todoListRepository: TodoListRepository, val cUserRepos
     }
 
     fun findUserTodoListsBy(username: String): List<TodoListResponse> =
-        cUserRepository.findById(username).get().let { sequenceOf(it.ownedTodoLists, it.sharedTodoLists) }
+        cUserRepository.findById(username).get().let { sequenceOf(it.ownedTodoLists, it.unownedTodoLists) }
             .flatten().toList()
             .map { todolist ->
                 todoListResponseMapping(todolist)
@@ -62,8 +62,8 @@ class TodoListService(val todoListRepository: TodoListRepository, val cUserRepos
             todoListResponseMapping(todolist)
         }
 
-    fun findUserSharedTodoListsBy(username: String): List<TodoListResponse> =
-        cUserRepository.findById(username).get().sharedTodoLists.map { todolist ->
+    fun findUserUnownedTodoListsBy(username: String): List<TodoListResponse> =
+        cUserRepository.findById(username).get().unownedTodoLists.map { todolist ->
             todoListResponseMapping(todolist)
         }
 

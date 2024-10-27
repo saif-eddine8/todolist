@@ -3,9 +3,7 @@ package com.todolist_alx.todolist.controller
 import com.todolist_alx.todolist.config.API_PREFIX
 import com.todolist_alx.todolist.model.CUser
 import com.todolist_alx.todolist.service.TodoListService
-import jakarta.websocket.server.PathParam
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -46,11 +44,11 @@ class TodoListController (val todoListService: TodoListService) {
         }
     }
 
-    @GetMapping("/shared/all")
-    fun userSharedTodoLists(authentication: Authentication): ResponseEntity<List<TodoListResponse>> {
-        // Fetch all user shared todoLists.
+    @GetMapping("/unowned/all")
+    fun userUnownedTodoLists(authentication: Authentication): ResponseEntity<List<TodoListResponse>> {
+        // Fetch all user unowned todoLists.
         try {
-            val userTodoLists = todoListService.findUserSharedTodoListsBy(authentication.name)
+            val userTodoLists = todoListService.findUserUnownedTodoListsBy(authentication.name)
             return ResponseEntity.ok(userTodoLists)
         } catch (ex: Exception) {
             ex.printStackTrace()
