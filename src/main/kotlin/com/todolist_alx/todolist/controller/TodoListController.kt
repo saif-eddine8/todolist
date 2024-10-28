@@ -86,7 +86,7 @@ class TodoListController (val todoListService: TodoListService) {
     }
 
     //Add new member if it doesn't exist.
-    @PostMapping("/{todolistId}/members/add/{username}")
+    @PostMapping("/{todolistId}/members/{username}/add")
     fun addNewMember(@PathVariable(value = "todolistId") todolistId: Long,
                      @PathVariable(value = "username") username: String,
                      authentication: Authentication
@@ -104,7 +104,7 @@ class TodoListController (val todoListService: TodoListService) {
     }
 
     //Remove member if it doesn't exist.
-    @DeleteMapping("/{todolistId}/members/remove/{username}")
+    @DeleteMapping("/{todolistId}/members/{username}/remove")
     fun removeMember(@PathVariable(value = "todolistId") todolistId: Long,
                      @PathVariable(value = "username") username: String,
                      authentication: Authentication
